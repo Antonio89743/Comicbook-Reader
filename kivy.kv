@@ -1,0 +1,616 @@
+#:import Factory kivy.factory.Factory
+
+<LocalFolderPopUp@Popup>
+    id: local_folder_popup
+    auto_dismiss: False
+    title: "Choose Folder"
+    size_hint: (0.8, 0.8)
+    pos_hint: {"center_x": 0.5}
+    on_open: root.add_drives()
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "horizontal"
+        ScrollView:
+            id: local_folder_popup_scroll_view
+            always_overscroll: False
+            do_scroll_x: False
+            size_hint: (None, 1)
+            pos_hint: {"left": 1}
+            width: 70
+            BoxLayout:
+                id: folder_chooser_box_layout_vertical
+                width: local_folder_popup_scroll_view.width 
+                height: self.minimum_height 
+                orientation: "vertical"
+        BoxLayout:
+            size: root.size
+            pos: root.pos
+            orientation: "vertical"
+            FileChooserListView:
+                id: folder_chooser
+                dirselect: True   
+                rootpath: "E:"
+            BoxLayout:
+                size_hint_y: None
+                height: 30
+                Button:
+                    text: "Close"
+                    on_release: root.dismiss()
+                Button:
+                    text: "Add Folder"
+                    on_release: app.add_folder_to_scan_folder_selected(folder_chooser.selection)
+                    
+<LocalFoldersExpansionPanelContent>
+    local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list: local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list
+    id: expansion_panel
+    height: self.minimum_height
+    adaptive_height: True
+    orientation: "vertical"
+    pos_hint: {"center_x": 0.5}
+    size_hint: (1, None)
+    padding: [20, 20, 20, 20]
+    spacing: 20
+    BoxLayout:
+        height: self.minimum_height
+        adaptive_height: True
+        orientation: "vertical"
+        pos_hint: {"center_x": 0.5}
+        size_hint: (1, None)
+        padding: [20, 20, 20, 20]
+        spacing: 20
+        Button:
+            text: "Add Local Folder To Scan"
+            size_hint: (1, None)
+            pos_hint: {"center_x": 0.5, "top": 1}
+            on_press: Factory.LocalFolderPopUp().open()
+        BoxLayout:
+            id: local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list
+            height: self.minimum_height
+            adaptive_height: True
+            orientation: "vertical"
+            pos_hint: {"center_x": 0.5}
+            size_hint: (1, None)
+            padding: [20, 20, 20, 20]
+            spacing: 20
+
+<MainMenuFilesContextMenu>
+    ContextMenu:
+        id: context_menu
+        visible: True
+        cancel_handler_widget: layout
+
+        ContextMenuTextItem:
+            text: "SubMenu #2"
+        ContextMenuTextItem:
+            text: "SubMenu #3"
+
+Screen:
+    GridLayout:
+        id: root_screen_horizontal_box_layout
+        cols: 2
+        width: self.minimum_width
+        size_hint: (None, 1)
+        MDCard:
+            id: navbar
+            size_hint: (None, 1)
+            width: 50
+            pos_hint: {"left": 0, "y": 0}
+            md_bg_color: (0, 0, 1, 1)
+            radius: [0, 0, 0, 0]
+            ScrollView:
+                id: navbar_scroll_view
+                always_overscroll: False
+                do_scroll_x: False
+                pos_hint: {"right": 1}
+                size_hint: (None, None)
+                width: navbar.width
+                height: root.height
+                BoxLayout:
+                    id: nav_bar
+                    padding: [10, 10, 10, 10]
+                    spacing: 20    
+                    orientation: "vertical"
+                    pos_hint: {"left": 0, "y": 0}
+                    size_hint_x: 1
+                    MDIconButton:
+                        pos_hint: {"y": 1}
+                        size_hint_x: 1
+                        icon: "icons and images\go back.png"
+                        icon_size: 5
+                        on_press: app.return_to_previous_tab_or_screen()
+                    MDIconButton:
+                        pos_hint: {"center_y": 1}
+                        size_hint_x: 1
+                        color : [1.0, 1.0, 1.0, 1.0]      
+                        icon: "icons and images\search.png"
+                        icon_size: 5
+                    MDIconButton:
+                        pos_hint: {"center_y": 1}
+                        size_hint_x: 1
+                        color : [1.0, 1.0, 1.0, 1.0]
+                        icon: "icons and images\Home-icon.svg.png" 
+                        icon_size: 5
+                        on_press: app.change_screen("Main Menu", False)
+                    MDIconButton:
+                        pos_hint: {"y": 1}
+                        size_hint_x: 1
+                        color : [1.0, 1.0, 1.0, 1.0]
+                        icon_size: 5
+                        on_press: app.change_screen("Read Currently Open File Screen", False)
+                    MDIconButton:
+                        pos_hint: {"y": 1}
+                        size_hint_x: 1
+                        color : [1.0, 1.0, 1.0, 1.0]
+                        icon_size: 5
+                        on_press: app.change_screen("Album Inspector Screen", False)
+
+
+                    # <HoverItem@MDIconButton+HoverBehavior>:
+                    #     id: reading_sign_collections_navbar_button
+                    #     pos_hint: {"y": 1}
+                    #     width: navbar.width
+                    #     height: navbar.width
+                    #     color : [1.0, 1.0, 1.0, 1.0]
+                    #     icon_size: 5
+                    #     on_enter: reading_sign_collections_navbar_card.height = reading_sign_collections_navbar_button.height
+                    #     on_enter: reading_sign_collections_navbar_card.width = 150
+
+                    MDIconButton:
+                        id: reading_sign_collections_navbar_button
+                        pos_hint: {"y": 1}
+                        size_hint_x: 1
+                        color : [1.0, 1.0, 1.0, 1.0]
+                        icon_size: 5
+
+                        on_press: app.change_widget_width(reading_sign_collections_navbar_card, 150)
+                        on_press: reading_sign_collections_navbar_card.height = reading_sign_collections_navbar_button.height
+
+                    #     HoverBehavior:
+                    #         on_enter: reading_sign_collections_navbar_card.height = reading_sign_collections_navbar_button.height
+                    #         on_enter: reading_sign_collections_navbar_card.width = 150
+
+                    #     # on enter and on press get the thing to expand and show up, animate it
+                    #     # on leave, reverse the animation
+
+
+                    #     # on_enter: reading_sign_collections_navbar_card.height = reading_sign_collections_navbar_button.height
+                    #     # on_enter: reading_sign_collections_navbar_card.width = 150
+
+
+                    #     # on_leave: reading_sign_collections_navbar_card.height = 0
+                    #     # on_leave: reading_sign_collections_navbar_card.width = 0
+
+
+                    BoxLayout:
+                        id: nav_bar_settings
+                        orientation: "vertical"
+                        pos_hint: {"left": 0, "y": 0}
+                        MDIconButton:
+                            size_hint_x: 1
+                            pos_hint: {"y": 0}
+                            md_bg_color : [1.0, 1.0, 1.0, 1.0]
+                            icon: "icons and images\icons8-settings-500.png" 
+                            icon_size: 5
+                            on_press: app.change_screen("Settings Screen", False)
+        GridLayout:
+            id: root_screen_vertical_box_layout
+            size_hint: (None, None)
+            width: root.width - navbar.width
+            height: root.height
+            rows: 3
+            MDCard:
+                id: toolbar
+                size_hint: (1, None)
+                height: 50
+                md_bg_color: (0, 145, 255, 1)
+                radius: [0, 0, 0, 0]
+                Label:
+                    id: toolbar_label
+                    font_size: "25sp"
+                    text: "Book Reader"
+                    color: (0, 0, 0, 1)
+                    text_size: self.size
+                    halign: "left"
+                    valign: "center"
+            ScreenManager:
+                id: screen_manager
+                Screen:
+                    id: main_menu_screen
+                    name: "Main Menu"
+                    on_pre_enter: app.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_enter: toolbar_label.text = "Main Menu"
+                    size_hint: (None, None)
+                    width: root.width - navbar.width
+                    height: root_screen_vertical_box_layout.height - audio_player_card.height - toolbar.height
+                    y: 0
+                    TabbedPanel:
+                        id: main_menu_tabbed_panel
+                        do_default_tab: False
+                        tab_pos: "top_left"
+                        size_hint: (None, None)
+                        width: root.width - navbar.width
+                        height: root_screen_vertical_box_layout.height - audio_player_card.height - toolbar.height
+                        tab_width: 150
+                        pos_y: 0
+                        y: 0
+                        TabbedPanelItem:
+                            id: main_menu_files_tab
+                            text: "Files"
+                            BoxLayout:
+                                orientation: "vertical"
+                                BoxLayout:
+                                    orientation: "horizontal"
+                                    Label:
+                                        text: "Sort by: "
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                    Spinner: 
+                                        id: main_menu_files_widget_sort_spinner
+                                        text: "Release Date"
+                                        values: ("Release Date", "File Name", "Author Name", "File Format")
+                                        size_hint: (None, None)
+                                        sync_height: True
+                                        width: 100
+                                        height: 30
+                                        on_text: app.add_main_menu_widgets()
+                                    Button:
+                                        id: main_menu_files_widget_order
+                                        text: "Ascending"
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                        on_press: app.sort_order_button_pressed()
+                                    Button:
+                                        text: "Filter"
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                    Slider:
+                                        id: main_menu_file_widget_size_slider
+                                        orientation: "horizontal"
+                                        size_hint: (None, None)
+                                        width: 300
+                                        height: 30
+                                        value: 0.5
+                                        step: 0.01
+                                        min: 0.1
+                                        max: 1
+                                        on_value: app.on_slider_value_changed(main_menu_file_widget_size_slider)
+                                ScrollView:
+                                    id: main_menu_scroll_view
+                                    always_overscroll: False
+                                    do_scroll_x: False
+                                    pos_hint: {"right": 1}
+                                    size_hint: (None, None)
+                                    width: root.width - navbar.width
+                                    height: root.height - toolbar.height - 40 - 5 - 30 - audio_player_card.height
+                                    GridLayout:
+                                        id: main_menu_grid_layout
+                                        pos_hint: {"top": 1}
+                                        size_hint: (None, None)
+                                        width: main_menu_scroll_view.width 
+                                        height: self.minimum_height 
+                                        padding: [20, 20, 20, 20]
+                                        spacing: 20
+                                        cols: 5
+                        TabbedPanelItem:
+                            id: main_menu_authors_tab
+                            text: "Authors"
+                            BoxLayout:
+                                orientation: "vertical"
+                                BoxLayout:
+                                    orientation: "horizontal"
+                                    Label:
+                                        text: "Sort by: "
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                    Spinner: 
+                                        id: main_menu_authors_widget_sort_spinner
+                                        text: "Release Date"
+                                        values: ("Release Date", "File Name", "Author Name", "File Format")
+                                        size_hint: (None, None)
+                                        sync_height: True
+                                        width: 100
+                                        height: 30
+                                        on_text: app.add_main_menu_widgets()
+                                    Button:
+                                        id: main_menu_authors_widget_order
+                                        text: "Ascending"
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                        on_press: app.sort_order_button_pressed()
+                                    Button:
+                                        text: "Filter"
+                                        size_hint: (None, None)
+                                        width: 100
+                                        height: 30
+                                    Slider:
+                                        id: main_menu_authors_tab_widget_size_slider
+                                        orientation: "horizontal"
+                                        size_hint: (None, None)
+                                        width: 300
+                                        height: 30
+                                        value: 0.5
+                                        step: 0.01
+                                        min: 0.1
+                                        max: 1
+                                        on_value: app.on_slider_value_changed(main_menu_authors_tab_widget_size_slider)
+                                ScrollView:
+                                    id: main_menu_authors_scroll_view
+                                    always_overscroll: False
+                                    do_scroll_x: False
+                                    pos_hint: {"right": 1}
+                                    size_hint: (None, None)
+                                    width: root.width - navbar.width
+                                    height: root.height - toolbar.height - 40 - 5 - 30 - audio_player_card.height
+                                    GridLayout:
+                                        id: main_menu_authors_tab_grid_layout
+                                        pos_hint: {"top": 1}
+                                        size_hint: (None, None)
+                                        width: main_menu_scroll_view.width 
+                                        height: self.minimum_height 
+                                        padding: [20, 20, 20, 20]
+                                        spacing: 20
+                                        cols: 5
+                        TabbedPanelItem:
+                            id: main_menu_collections_tab
+                            text: "Collections"
+                            Label:
+                                text: "XXXXX"
+                Screen:
+                    name: "Read Currently Open File Screen"
+                    on_pre_enter: app.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
+                    on_pre_enter: app.change_widget_width(navbar, 0)
+                    on_enter: toolbar_label.text = ""
+                    MDCard:
+                        id: file_reader_content_card
+                        orientation: "vertical"
+                        size_hint: (None, None)
+                        pos_hint: {"center_x": 0.5}
+                        width: 1100
+                        height: root.height - audio_player_card.height - toolbar.height
+                        radius: [0, 0, 0, 0]
+                        ScrollView:
+                            id: file_reader_content_scroll_view
+                            always_overscroll: False
+                            do_scroll_x: False
+                            pos_hint: {"right": 1}
+                            size_hint: (None, None)
+                            width: file_reader_content_card.width
+                            height: file_reader_content_card.height
+                            BoxLayout:
+                                id: file_reader_content_box_layout
+                                pos_hint: {"top": 1}
+                                size_hint: (None, None)
+                                width: file_reader_content_scroll_view.width 
+                                height: self.minimum_height 
+                                orientation: "vertical"
+                    FloatLayout:
+                        size_hint: (1, 1)
+                        MDCard:
+                            id: file_reader_floating_options_card
+                            size_hint: (None, None)
+                            height: 40
+                            width: self.minimum_width
+                            pos: (300, 300)
+                            radius: [0, 0, 0, 0]
+                            md_bg_color: (0, 0, 0, 1)
+                            BoxLayout:
+                                id: file_reader_floating_options_card_horizontal_box_layout
+                                orientation: "horizontal"
+                                padding: [5, 5, 5, 5]
+                                spacing: 5
+                                size_hint: (1, 1)
+                                BoxLayout:
+                                    id: file_reader_floating_options_card_move_button_box_layout
+                                    orientation: "horizontal"
+                                    size_hint: (1, 1)
+                                    Button:
+                                        id: file_reader_floating_options_card_move_button
+                                        text: ":"
+                Screen:
+                    name: "File Details Screen"
+                    on_pre_enter: app.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_enter: toolbar_label.text = "File Detail Screen"
+                    MDLabel:
+                        text: "File Details Screen"
+                        halign: "center"
+                Screen:
+                    name: "Author Screen"
+                    on_pre_enter: app.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
+                    GridLayout:
+                        id: author_screen_grid_layout
+                        pos_hint: {"top": 1}
+                        size_hint: (None, None)
+                        width: main_menu_scroll_view.width 
+                        height: self.minimum_height                         
+
+
+
+
+                                # ScrollView:
+                                #     id: main_menu_authors_scroll_view
+                                #     always_overscroll: False
+                                #     do_scroll_x: False
+                                #     pos_hint: {"right": 1}
+                                #     size_hint: (None, None)
+                                #     width: root.width - navbar.width
+                                #     height: root.height - toolbar.height - 40 - 5 - 30 - audio_player_card.height
+                                #     GridLayout:
+                                #         id: main_menu_authors_tab_grid_layout
+                                #         pos_hint: {"top": 1}
+                                #         size_hint: (None, None)
+                                #         width: main_menu_scroll_view.width 
+                                #         height: self.minimum_height 
+                                #         padding: [20, 20, 20, 20]
+                                #         spacing: 20
+                                #         cols: 5
+
+
+
+
+
+
+
+                Screen:
+                    name: "Album Inspector Screen"
+                    on_pre_enter: app.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
+                    on_enter: toolbar_label.text = ""
+                    ScrollView:
+                        id: album_inspector_scroll_view
+                        always_overscroll: False
+                        do_scroll_x: False
+                        pos_hint: {"right": 1}
+                        size_hint: (None, None)
+                        width: root.width - navbar.width
+                        height: root.height - audio_player_card.height
+                        BoxLayout:
+                            id: album_inspector_box_layout
+                            pos_hint: {"top": 1}
+                            size_hint: (None, None)
+                            width: album_inspector_scroll_view.width 
+                            height: self.minimum_height 
+                            orientation: "vertical"
+                Screen:
+                    name: "Settings Screen"
+                    on_pre_enter: app.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_enter: toolbar_label.text = "Settings"
+                    TabbedPanel:
+                        do_default_tab: False
+                        tab_pos: "top_mid"
+                        size_hint: (None, None)
+                        tab_width: 200
+                        pos_hint: {"right": 1}
+                        width: root.width - navbar.width
+                        height: root.height - audio_player_card.height - toolbar.height
+                        TabbedPanelItem:
+                            text: "Themes & Preferences"
+                            Label:
+                                text: "CCCC"    
+                        TabbedPanelItem:
+                            text: "Scanning Folders"
+                            ScrollView:
+                                id: scroll_view
+                                always_overscroll: False
+                                do_scroll_x: False
+                                pos_hint: {"right": 1}
+                                size_hint: (None, None)
+                                width: root.width - navbar.width
+                                height: root.height - toolbar.height - 40
+                                BoxLayout:
+                                    id: settings_scanning_folders_tab_box_layout
+                                    pos_hint: {"top": 1}
+                                    size_hint: (None, None)
+                                    width: scroll_view.width 
+                                    height: self.minimum_height 
+                                    orientation: "vertical"
+                                    Label:
+                                        text: "Local Folders To Scan"
+                                        font_size: 20
+                                        halign: "left"
+                                        size_hint: (None, None)
+                                        pos_hint: {"left": 1, "top": 1}
+                                        width: 250
+                                        height: 50
+                                    BoxLayout:
+                                        id: settings_scanning_local_folders_tab_box_layout
+                                        pos_hint: {"center_x": 0.5}
+                                        size_hint: (0.8, None)
+                                        height: self.minimum_height 
+                                        orientation: "vertical"
+                        TabbedPanelItem:
+                            text: "About"
+                            Label:
+                                text: "cxzczxc"
+            MDCard:
+                id: audio_player_card
+                size_hint: (None, None)
+                height: 70
+                width: root.width - 70
+                pos_hint: {"right": 1, "bottom": 0}
+                md_bg_color: (1, 1, 1, 1)
+                radius: [0, 0, 0, 0]
+                BoxLayout:
+                    orientation: "horizontal"
+                    width: root.width - navbar.width
+                    Button:
+                        id: audio_player_card_file_viewer_button
+                        pos_hint: {"bottom": 1}
+                        size_hint: (None, 1)
+                        width: 300
+                        BoxLayout:
+                            orientation: "horizontal"
+                            pos_hint: {"bottom": 1, "left": 1}
+                            size_hint: (None, None)
+                            pos: audio_player_card_file_viewer_button.pos
+                            height: audio_player_card_file_viewer_button.height
+                            Image:
+                                id: audio_player_card_cover_image
+                                allow_stretch: True
+                                keep_ratio: True
+                                pos_hint: {"bottom": 1, "left": 1}
+                        BoxLayout:
+                            orientation: "vertical"
+                            pos_hint: {"bottom": 1, "right": 1}
+                            size_hint: (None, None)
+                            pos: audio_player_card_file_viewer_button.pos
+                            x: audio_player_card_cover_image.x + audio_player_card_cover_image.width + 10
+                            height: audio_player_card_file_viewer_button.height
+                            Label:
+                                id: audio_player_card_file_title_label
+                            Label:
+                                id: audio_player_card_file_author_label
+                    BoxLayout:
+                        orientation: "vertical"
+                        BoxLayout:
+                            orientation: "horizontal"
+                            Button:
+                                id: audio_player_card_play_previous_track_button
+                                on_press: app.on_play_previous_audio_file_button_pressed()
+                                text: "<"
+                                size_hint: (None, 1)
+                                width: 60
+                            Button:
+                                id: audio_player_card_pause_resume_button
+                                on_press: app.on_pause_resume_audio_file_button_pressed()
+                                text: "||"
+                                size_hint: (None, 1)
+                                width: 60
+                            Button:
+                                id: audio_player_card_play_next_track_button                     
+                                on_press: app.on_play_next_audio_file_button_pressed()
+                                text: ">"
+                                size_hint: (None, 1)
+                                width: 60
+                        BoxLayout:
+                            orientation: "horizontal"
+
+                            # time current
+
+                            # timeline
+                            Label:
+                                id: audio_player_card_file_lenght_label 
+    FloatLayout:
+        size_hint: (1, 1)
+        MDCard:
+            id: reading_sign_collections_navbar_card
+            size_hint: (None, None)
+            # width: 150
+            # height: reading_sign_collections_navbar_button.height
+            # size: (0, 0)
+            width: 0
+            height: 0
+            x: reading_sign_collections_navbar_button.x + reading_sign_collections_navbar_button.width
+            y: reading_sign_collections_navbar_button.y
+            md_bg_color: (0, 0, 1, 1)
+            radius: [0, 0, 0, 0]
