@@ -71,31 +71,50 @@ import kivy as kivyscript
 class AbstractScanDirectoryManager(ABC):
 
     @abstractmethod
-    def scan_local_directories():
+    def scan_directory():
         raise NotImplementedError("Must override scan_local_dictionaries")
-
-
-
-
-
 
 class ScanDirectoryManager(): 
 
     @staticmethod
     def scan_all_directories():
-        LocalScanDirectory.scan_local_directories()
-        CloudScanDirectory.scan_local_directories()
+        # for directory in 
+        # LocalScanDirectory.scan_directory(directory)
+        # CloudScanDirectory.scan_directory()
 
-
-
-
+        # at the end call func to create all the widgets for authors and files
+        pass
 
 
 class LocalScanDirectory(AbstractScanDirectoryManager):
 
     @staticmethod
-    def scan_local_directories():
-        print("am in methodB")
+    def scan_directory(directory):
+        cba_files = glob(directory + "/**/*.cba", recursive = True)
+        cbr_files = glob(directory + "/**/*.cbr", recursive = True)
+        cbz_files = glob(directory + "/**/*.cbz", recursive = True)
+        cb7_files = glob(directory + "/**/*.cb7", recursive = True)
+
+        for cba_file in cba_files:
+            pass
+        for cbr_file in cbr_files:
+            pass
+
+        for cbz_file in cbz_files:
+            # save cover photo, title
+            pass
+
+        for cb7_file in cb7_files:
+            pass
+
+        # here create a dir of files
+        
+        LocalScanDirectory.save_scanned_files_dictionary()
+        
+    @staticmethod
+    def save_scanned_files_dictionary():
+        pass
+
 
     @staticmethod
     def add_local_dictionary_to_scan_list():
@@ -109,19 +128,39 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
 
 
 
-class CloudScanDirectory(AbstractScanDirectoryManager):
+# class CloudScanDirectory(AbstractScanDirectoryManager):
 
-    @staticmethod
-    def scan_local_directories():
-        print("am in meth")
+#     @staticmethod
+#     def scan_directory():
+#         print("am in meth")
 
-    @staticmethod
-    def add_local_dictionary_to_scan_list():
-        pass
+#     @staticmethod
+#     def add_local_dictionary_to_scan_list():
+#         pass
 
-    @staticmethod
-    def remove_local_dictionary_from_scan_list():
-        pass
+#     @staticmethod
+#     def remove_local_dictionary_from_scan_list():
+#         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # only have one json file, in it save data about app, save local folders, cloud folders to scan
@@ -148,6 +187,7 @@ class ComicbookReaderGUI(MDApp):
         # print(Config.get("graphics", "window_state"), Config.get("graphics", "fullscreen"))
         # Config.set("graphics", "window_state", "hidden")
 
+print(LocalScanDirectory.scan_directories(r"E:\Comic Books, Manga & Visual Novels"))
 
 ComicbookReaderGUI().run()
 
