@@ -57,10 +57,13 @@ import kivy as kivyscript
 # test deleting file from directory and opening it once the file's location is already saved in app json
 
 
-
 # get folders
 # from them, get files
     # on open run this func with previously saved folders, try not to freeze app, only save new ones and don't touch older ones
+
+
+# directories_to_scan_save_file_location = "Book Worm\Book Worm\local_folders_to_scan.json"
+# files_scanned_dictionary_file_location = "Book Worm\Book Worm\local_folders_to_scan.json"
 
 class AbstractScanDirectoryManager(ABC):
 
@@ -116,7 +119,6 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
     def save_scanned_files_dictionary():
         pass
 
-
     @staticmethod
     def add_local_dictionary_to_scan_list(directory):
         unique_folder = True
@@ -146,14 +148,11 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
         pass
 
 
-
-
-
 # class CloudScanDirectory(AbstractScanDirectoryManager):
 
 #     @staticmethod
 #     def scan_directory():
-#         print("am in meth")
+#         pass
 
 #     @staticmethod
 #     def add_local_dictionary_to_scan_list():
@@ -162,7 +161,6 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
 #     @staticmethod
 #     def remove_local_dictionary_from_scan_list():
 #         pass
-
 
 
 class LocalFolderPopUp(Popup):
@@ -192,7 +190,7 @@ class AddLocalFolderToScanDialog():
 class LocalFoldersExpansionPanelContent(BoxLayout):
     '''LocalFoldersExpansionPanelContent'''
         
-class ScreenManager():
+class ScreenManager(): # needs some fixing
 
     app = None
     screen_currently_in_use :int = 0
@@ -202,7 +200,7 @@ class ScreenManager():
         self.app = app
 
     def go_forward_to_next_tab_or_screen(self):
-        self.change_screen(self.previous_screens_and_tabs_list[self.screen_currently_in_use + 1], True)
+            self.change_screen(self.previous_screens_and_tabs_list[self.screen_currently_in_use + 1], True)
 
     def return_to_previous_tab_or_screen(self):
         self.screen_currently_in_use -= 1
@@ -215,8 +213,6 @@ class ScreenManager():
             self.screen_currently_in_use += 1
 
 class WidgetManager():
-
-    reading_sign_collections_navbar_card_pulled_out = None
 
     def __init__(self, app):
         self.app = app
@@ -237,7 +233,7 @@ class WidgetManager():
                 if self.app.root.ids.reading_sign_collections_navbar_card.width != new_value:
                     animation.start(self.app.root.ids.reading_sign_collections_navbar_card, )
                     if new_value != 0:
-                        self.reading_sign_collections_navbar_card_pulled_out = True #####################################
+                        self.app.reading_sign_collections_navbar_card_pulled_out = True
             elif widget_id == self.app.root.ids.navbar:
                     if self.app.root.ids.navbar.width != new_value:
                         animation.start(self.app.root.ids.navbar)            
@@ -255,11 +251,11 @@ class InputManager:
         self.app = app
 
     def on_mouse_down(self, *args):
-        print("Mouse input:", args)
+        # print("Mouse input:", args)
         if args[3] == "mouse5":
-            self.go_forward_to_next_tab_or_screen()
+            self.app.screen_manager_object.go_forward_to_next_tab_or_screen()
         if args[3] == "mouse4":
-            self.return_to_previous_tab_or_screen()
+            self.app.screen_manager_object.return_to_previous_tab_or_screen()
 
         if args[3] == "scrollup":
             self.mouse_button_and_keayboard_input(args[3])
@@ -267,7 +263,7 @@ class InputManager:
             self.mouse_button_and_keayboard_input(args[3])
 
     def on_key_down(self, *args):
-        print("Keyboard input:", args)
+        # print("Keyboard input:", args)
         if args[3] == "y" and str(args[4]) == "['ctrl']":
             pass
         if args[3] == "z" and str(args[4]) == "['ctrl']":
@@ -277,9 +273,27 @@ class InputManager:
         else:
             self.keyboard_ctrl_button_pressed = False
         if args[1] == 27:
-            self.change_screen("Settings Screen", False)
+            self.app.screen_manager_object.change_screen("Settings Screen", False)
         if args[1] == 1073742085:
             self.on_pause_resume_audio_file_button_pressed()
+
+    def on_mouse_position_changed(self, window_object, mouse_position):
+        self.check_mouse_position_on_navbar(mouse_position)
+        pass
+
+    def check_mouse_position_on_navbar(self, mouse_position):
+        if self.app.root.ids.screen_manager.current == "Read Currently Open File Screen":
+            if self.app.root.ids.navbar.width < 50:
+                if mouse_position[0] <= self.root.ids.navbar.pos[0] + self.navbar_width_max:
+                    self.widget_manager_object.change_widget_width(self.root.ids.navbar, 50)
+            elif self.root.ids.navbar.width == 50:
+                if mouse_position[0] > 50:
+                    self.widget_manager_object.change_widget_width(self.root.ids.navbar, 0)
+        if self.app.reading_sign_collections_navbar_card_pulled_out == True:
+            # if mouse_position[0] isnt between widget width
+            #     and if mouse_position[1] isnt between widget height
+            #     self.change_widget_width(self.root.ids.reading_sign_collections_navbar_card, 0)
+            pass
 
 class MDWidgetManager:
     def __init__(self, app):
@@ -306,43 +320,21 @@ class MDWidgetManager:
 
 class ComicbookReaderGUI(MDApp):
 
-    local_scan_directory_class = LocalScanDirectory
-
-
-
-
-
-    def on_mouse_position_changed(self, window_object, mouse_position):
-        # self.check_mouse_position_on_navbar(mouse_position)
-        pass
-
-    # def check_mouse_position_on_navbar(self, mouse_position):
-    #     if self.root.ids.screen_manager.current == "Read Currently Open File Screen":
-    #         if self.root.ids.navbar.width < 50:
-    #             if mouse_position[0] <= self.root.ids.navbar.pos[0] + self.navbar_width_max:
-    #                 self.change_widget_width(self.root.ids.navbar, 50)
-    #         elif self.root.ids.navbar.width == 50:
-    #             if mouse_position[0] > 50:
-    #                 self.change_widget_width(self.root.ids.navbar, 0)
-    #     if self.reading_sign_collections_navbar_card_pulled_out == True:
-    #         # if mouse_position[0] isnt between widget width
-    #             # and if mouse_position[1] isnt between widget height
-    #             # self.change_widget_width(self.root.ids.reading_sign_collections_navbar_card, 0)
-    #         pass
-
     def build(self):
         self.title = "Comicbook Reader"
         # Window.bind(on_resize = self.window_resized)
         # Window.bind(on_restore = self.responsive_grid_layout)
         # Window.bind(on_maximize = self.responsive_grid_layout)
         # Window.bind(on_request_close = self.on_request_close)
-        Window.bind(mouse_pos = self.on_mouse_position_changed)
+        self.local_scan_directory_class = LocalScanDirectory
+        self.reading_sign_collections_navbar_card_pulled_out = False
         self.screen_manager_object = ScreenManager(MDApp.get_running_app())
         self.widget_manager_object = WidgetManager(MDApp.get_running_app())
         self.input_manager_object = InputManager(MDApp.get_running_app())
         self.md_widget_manager_object = MDWidgetManager(MDApp.get_running_app())
         Window.bind(on_key_down = self.input_manager_object.on_key_down)
         Window.bind(on_mouse_down = self.input_manager_object.on_mouse_down)
+        Window.bind(mouse_pos = self.input_manager_object.on_mouse_position_changed)
         return Builder.load_file("kivy.kv")
     
     def on_start(self):
@@ -355,9 +347,3 @@ class ComicbookReaderGUI(MDApp):
         # Config.set("graphics", "window_state", "hidden")
 
 ComicbookReaderGUI().run()
-
-
-
-
-
-
