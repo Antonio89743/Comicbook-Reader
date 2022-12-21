@@ -39,7 +39,7 @@
                     on_release: root.dismiss()
                 Button:
                     text: "Add Folder"
-                    on_release: app.add_folder_to_scan_folder_selected(folder_chooser.selection)
+                    on_release: app.local_scan_directory_class.add_local_dictionary_to_scan_list(folder_chooser.selection)
                     
 <LocalFoldersExpansionPanelContent>
     local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list: local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list
@@ -118,7 +118,7 @@ Screen:
                         size_hint_x: 1
                         icon: "icons and images\go back.png"
                         icon_size: 5
-                        on_press: app.return_to_previous_tab_or_screen()
+                        on_press: app.screen_manager_object.return_to_previous_tab_or_screen()
                     MDIconButton:
                         pos_hint: {"center_y": 1}
                         size_hint_x: 1
@@ -131,19 +131,19 @@ Screen:
                         color : [1.0, 1.0, 1.0, 1.0]
                         icon: "icons and images\Home-icon.svg.png" 
                         icon_size: 5
-                        on_press: app.change_screen("Main Menu", False)
+                        on_press: app.screen_manager_object.change_screen("Main Menu", False)
                     MDIconButton:
                         pos_hint: {"y": 1}
                         size_hint_x: 1
                         color : [1.0, 1.0, 1.0, 1.0]
                         icon_size: 5
-                        on_press: app.change_screen("Read Currently Open File Screen", False)
+                        on_press: app.screen_manager_object.change_screen("Read Currently Open File Screen", False)
                     MDIconButton:
                         pos_hint: {"y": 1}
                         size_hint_x: 1
                         color : [1.0, 1.0, 1.0, 1.0]
                         icon_size: 5
-                        on_press: app.change_screen("Album Inspector Screen", False)
+                        on_press: app.screen_manager_object.change_screen("Album Inspector Screen", False)
 
 
                     # <HoverItem@MDIconButton+HoverBehavior>:
@@ -163,7 +163,7 @@ Screen:
                         color : [1.0, 1.0, 1.0, 1.0]
                         icon_size: 5
 
-                        on_press: app.change_widget_width(reading_sign_collections_navbar_card, 150)
+                        on_press: app.widget_manager_object.change_widget_width(reading_sign_collections_navbar_card, 150)
                         on_press: reading_sign_collections_navbar_card.height = reading_sign_collections_navbar_button.height
 
                     #     HoverBehavior:
@@ -192,7 +192,7 @@ Screen:
                             md_bg_color : [1.0, 1.0, 1.0, 1.0]
                             icon: "icons and images\icons8-settings-500.png" 
                             icon_size: 5
-                            on_press: app.change_screen("Settings Screen", False)
+                            on_press: app.screen_manager_object.change_screen("Settings Screen", False)
         GridLayout:
             id: root_screen_vertical_box_layout
             size_hint: (None, None)
@@ -218,8 +218,8 @@ Screen:
                 Screen:
                     id: main_menu_screen
                     name: "Main Menu"
-                    on_pre_enter: app.change_widget_height(toolbar, 50)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 1)
                     on_enter: toolbar_label.text = "Main Menu"
                     size_hint: (None, None)
                     width: root.width - navbar.width
@@ -364,9 +364,9 @@ Screen:
                                 text: "XXXXX"
                 Screen:
                     name: "Read Currently Open File Screen"
-                    on_pre_enter: app.change_widget_height(toolbar, 0)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
-                    on_pre_enter: app.change_widget_width(navbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_width(navbar, 0)
                     on_enter: toolbar_label.text = ""
                     MDCard:
                         id: file_reader_content_card
@@ -416,16 +416,16 @@ Screen:
                                         text: ":"
                 Screen:
                     name: "File Details Screen"
-                    on_pre_enter: app.change_widget_height(toolbar, 50)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 1)
                     on_enter: toolbar_label.text = "File Detail Screen"
                     MDLabel:
                         text: "File Details Screen"
                         halign: "center"
                 Screen:
                     name: "Author Screen"
-                    on_pre_enter: app.change_widget_height(toolbar, 0)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 0)
                     GridLayout:
                         id: author_screen_grid_layout
                         pos_hint: {"top": 1}
@@ -462,8 +462,8 @@ Screen:
 
                 Screen:
                     name: "Album Inspector Screen"
-                    on_pre_enter: app.change_widget_height(toolbar, 0)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 0)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 0)
                     on_enter: toolbar_label.text = ""
                     ScrollView:
                         id: album_inspector_scroll_view
@@ -482,8 +482,8 @@ Screen:
                             orientation: "vertical"
                 Screen:
                     name: "Settings Screen"
-                    on_pre_enter: app.change_widget_height(toolbar, 50)
-                    on_pre_enter: app.change_widget_opacity(toolbar, 1)
+                    on_pre_enter: app.widget_manager_object.change_widget_height(toolbar, 50)
+                    on_pre_enter: app.widget_manager_object.change_widget_opacity(toolbar, 1)
                     on_enter: toolbar_label.text = "Settings"
                     TabbedPanel:
                         do_default_tab: False

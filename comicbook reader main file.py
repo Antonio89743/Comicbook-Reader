@@ -121,27 +121,27 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
 
     @staticmethod
     def add_local_dictionary_to_scan_list(directory):
-        unique_folder = True
-        folder_selected_string = str(directory)
-        if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
-            file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
-            json_file_data = file.read()
-            file.close()
-            if json_file_data != "":
-                list_of_folders_to_scan = eval(json_file_data)
-                folder_selected_string_path = re.sub("/+", "/", folder_selected_string[2:-2])
-                for folder in list_of_folders_to_scan:
-                    folder_path = re.sub("/+", "/", folder)
-                    if folder_path == folder_selected_string_path:
-                        unique_folder = False
+        unique_directory = True
+        directory_selected_string = str(directory)
+        # if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
+        #     file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
+        #     json_file_data = file.read()
+        #     file.close()
+        #     if json_file_data != "":
+        #         list_of_folders_to_scan = eval(json_file_data)
+        #         directory_selected_string = re.sub("/+", "/", directory_selected_string[2:-2])
+        #         for folder in list_of_folders_to_scan:
+        #             folder_path = re.sub("/+", "/", folder)
+        #             if folder_path == directory_selected_string:
+        #                 unique_folder = False
 
                         
         # if unique_folder == True:
         #     self.Folder_To_Scan_Card(self, directory)
-        # self.list_of_files = scan_folders.scan_folders(folder_selected_string, unique_folder)
+        # self.list_of_files = scan_folders.scan_folders(directory_selected_string, unique_folder)
         # self.create_authors_dictionary()
         # self.add_main_menu_widgets()
-        LocalScanDirectory.scan_directory(directory)
+        LocalScanDirectory.scan_directory(directory_selected_string)
 
     @staticmethod
     def remove_local_dictionary_from_scan_list():
