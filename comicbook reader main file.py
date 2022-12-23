@@ -75,13 +75,21 @@ class ScanDirectoryManager():
 
     @staticmethod
     def scan_all_directories():
+
+        # check if local json with directories exists
+            # if it does, enter it, iterate it and for each directory call local scan func
+            # else, create that file
+
+
+
+
+
         # for directory in 
         # LocalScanDirectory.scan_directory(directory)
         # CloudScanDirectory.scan_directory()
 
         # at the end call func to create all the widgets for authors and files
         pass
-
 
 class LocalScanDirectory(AbstractScanDirectoryManager):
 
@@ -123,21 +131,30 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
     def add_local_dictionary_to_scan_list(directory):
         unique_directory = True
         directory_selected_string = str(directory)
-        # if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
-        #     file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
-        #     json_file_data = file.read()
-        #     file.close()
-        #     if json_file_data != "":
-        #         list_of_folders_to_scan = eval(json_file_data)
-        #         directory_selected_string = re.sub("/+", "/", directory_selected_string[2:-2])
-        #         for folder in list_of_folders_to_scan:
-        #             folder_path = re.sub("/+", "/", folder)
-        #             if folder_path == directory_selected_string:
-        #                 unique_folder = False
+
+        # check if json exists?
+        # if not, create it
+        # add folder in the array json
+
+        if exists("Book Worm\Book Worm\local_folders_to_scan.json") == False:
+            open("Book Worm\Book Worm\local_folders_to_scan.json", "a").close()
+        if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
+            file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
+            json_file_data = file.read()
+            file.close()
+            if json_file_data != "":
+                list_of_folders_to_scan = eval(json_file_data)
+                directory_selected_string = re.sub("/+", "/", directory_selected_string[2:-2])
+                for folder in list_of_folders_to_scan:
+                    folder_path = re.sub("/+", "/", folder)
+                    if folder_path == directory_selected_string:
+                        unique_folder = False
 
                         
         # if unique_folder == True:
-        #     self.Folder_To_Scan_Card(self, directory)
+        #     self.Folder_To_Scan_Card(self, directory) #create a card in settings screen
+
+
         # self.list_of_files = scan_folders.scan_folders(directory_selected_string, unique_folder)
         # self.create_authors_dictionary()
         # self.add_main_menu_widgets()
@@ -170,8 +187,9 @@ class LocalFolderPopUp(Popup):
             KivyButton(
                 text = drive,
                 pos_hint = {"top": 1},
-                size_hint = (1, None),
-                height = 70,
+                size_hint = (None, None),
+                height = 60,
+                width = 60,
                 on_press = lambda x: app.drive_chosen(app, drive)
                 )
             )
@@ -191,13 +209,10 @@ class LocalFoldersExpansionPanelContent(BoxLayout):
     '''LocalFoldersExpansionPanelContent'''
         
 class ScreenManager(): # needs some fixing
-
-    app = None
-    screen_currently_in_use :int = 0
-    previous_screens_and_tabs_list = ["Main Menu"]
-
     def __init__(self, app):
         self.app = app
+        self.screen_currently_in_use :int = 0
+        self.previous_screens_and_tabs_list = ["Main Menu"]
 
     def go_forward_to_next_tab_or_screen(self):
             self.change_screen(self.previous_screens_and_tabs_list[self.screen_currently_in_use + 1], True)
@@ -213,7 +228,6 @@ class ScreenManager(): # needs some fixing
             self.screen_currently_in_use += 1
 
 class WidgetManager():
-
     def __init__(self, app):
         self.app = app
 
@@ -249,6 +263,7 @@ class WidgetManager():
 class InputManager:
     def __init__(self, app):
         self.app = app
+        self.keyboard_ctrl_button_pressed = False
 
     def on_mouse_down(self, *args):
         # print("Mouse input:", args)
@@ -279,7 +294,6 @@ class InputManager:
 
     def on_mouse_position_changed(self, window_object, mouse_position):
         self.check_mouse_position_on_navbar(mouse_position)
-        pass
 
     def check_mouse_position_on_navbar(self, mouse_position):
         if self.app.root.ids.screen_manager.current == "Read Currently Open File Screen":
@@ -294,6 +308,25 @@ class InputManager:
             #     and if mouse_position[1] isnt between widget height
             #     self.change_widget_width(self.root.ids.reading_sign_collections_navbar_card, 0)
             pass
+
+    def mouse_button_and_keayboard_input(self, mouse_wheel_input):
+        # check current screen, if main menu, if files tab, chage size of widgets by some increment, same if authors tab
+        if self.keyboard_ctrl_button_pressed == True:
+            if mouse_wheel_input == "scrollup":
+                if self.app.root.ids.screen_manager.current == "Main Menu":
+                    if self.app.root.ids.main_menu_tabbed_panel.current_tab.text == "Files":
+                        self.app.root.ids.main_menu_file_widget_size_slider.value -= 10
+                        self.on_slider_value_changed(self.root.ids.main_menu_file_widget_size_slider)
+                    elif self.app.root.ids.main_menu_tabbed_panel.current_tab.text == "Authors":
+                        self.app.root.ids.main_menu_authors_tab_widget_size_slider.value -= 10
+                        self.on_slider_value_changed(self.root.ids.main_menu_authors_tab_widget_size_slider)
+                        # [WARNING] <kivy.uix.gridlayout.GridLayout object at 0x000002C0FF490350> have no cols or rows set, layout is not triggered.
+                    elif self.app.root.ids.main_menu_tabbed_panel.current_tab == "Authors":
+                        pass
+                elif self.app.root.ids.screen_manager.current == "Read Currently Open File Screen":
+                    pass
+            elif mouse_wheel_input == "scrolldown":
+                pass
 
 class MDWidgetManager:
     def __init__(self, app):
@@ -335,15 +368,26 @@ class ComicbookReaderGUI(MDApp):
         Window.bind(on_key_down = self.input_manager_object.on_key_down)
         Window.bind(on_mouse_down = self.input_manager_object.on_mouse_down)
         Window.bind(mouse_pos = self.input_manager_object.on_mouse_position_changed)
-        return Builder.load_file("kivy.kv")
+        return Builder.load_file("kivy_gui.kv")
     
     def on_start(self):
-        ScanDirectoryManager.scan_all_directories()
         # self.load_last_used_settings()
         # self.responsive_grid_layout()
         self.md_widget_manager_object.create_local_folders_to_scan_expansion_panel()
         # self.local_folders_and_files_scan()
         # print(Config.get("graphics", "window_state"), Config.get("graphics", "fullscreen"))
         # Config.set("graphics", "window_state", "hidden")
+        # ScanDirectoryManager.scan_all_directories() #first create all the main menu widgets, then scan folders, make sure this doesn't freeze the device
 
 ComicbookReaderGUI().run()
+
+# when and where will file dict json be called from?
+
+# should this be written in file class?
+    # in that case, what to do with authors tab
+    # should authors tab json be a thing?
+
+
+
+# first do scan individual directory picked
+    # and add it to json

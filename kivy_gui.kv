@@ -15,11 +15,14 @@
             id: local_folder_popup_scroll_view
             always_overscroll: False
             do_scroll_x: False
-            size_hint: (None, 1)
+            size_hint: (None, None)
             pos_hint: {"left": 1}
+            # height: root.height - root.separator_height - root.title_size - 20 - audio_player_card.height
+            height: root.height - 40 - 5 - 30 # - audio_player_card.height - toolbar.height
             width: 70
             BoxLayout:
                 id: folder_chooser_box_layout_vertical
+                size_hint: (None, None)
                 width: local_folder_popup_scroll_view.width 
                 height: self.minimum_height 
                 orientation: "vertical"
@@ -74,16 +77,16 @@
             padding: [20, 20, 20, 20]
             spacing: 20
 
-<MainMenuFilesContextMenu>
-    ContextMenu:
-        id: context_menu
-        visible: True
-        cancel_handler_widget: layout
+# <MainMenuFilesContextMenu>
+#     ContextMenu:
+#         id: context_menu
+#         visible: True
+#         cancel_handler_widget: layout
 
-        ContextMenuTextItem:
-            text: "SubMenu #2"
-        ContextMenuTextItem:
-            text: "SubMenu #3"
+#         ContextMenuTextItem:
+#             text: "SubMenu #2"
+#         ContextMenuTextItem:
+#             text: "SubMenu #3"
 
 Screen:
     GridLayout:
