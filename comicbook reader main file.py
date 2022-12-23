@@ -53,6 +53,7 @@ from itertools import cycle
 import kivy_garden.contextmenu as ContextMenu
 from kivy.factory import Factory
 import kivy as kivyscript
+from pathlib import Path
 
 # test deleting file from directory and opening it once the file's location is already saved in app json
 
@@ -129,27 +130,31 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
 
     @staticmethod
     def add_local_dictionary_to_scan_list(directory):
+        directory_string_posix = Path(str(directory)[2:-2]).as_posix()
         unique_directory = True
-        directory_selected_string = str(directory)
-
-        # check if json exists?
-        # if not, create it
-        # add folder in the array json
-
-        if exists("Book Worm\Book Worm\local_folders_to_scan.json") == False:
-            open("Book Worm\Book Worm\local_folders_to_scan.json", "a").close()
-        if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
-            file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
-            json_file_data = file.read()
-            file.close()
-            if json_file_data != "":
-                list_of_folders_to_scan = eval(json_file_data)
-                directory_selected_string = re.sub("/+", "/", directory_selected_string[2:-2])
-                for folder in list_of_folders_to_scan:
-                    folder_path = re.sub("/+", "/", folder)
-                    if folder_path == directory_selected_string:
-                        unique_folder = False
-
+        save_folder_location = "save_files"
+        local_directories_to_scan_save_file_location = save_folder_location + "/local_directories_to_scan.json"
+        if exists(local_directories_to_scan_save_file_location) == False:
+            os.makedirs(os.path.dirname(local_directories_to_scan_save_file_location), exist_ok = True)
+        try:
+            if exists(local_directories_to_scan_save_file_location):
+                file = open(local_directories_to_scan_save_file_location, "r+")
+                json_file_data = file.read()
+                if json_file_data != "":
+                    list_of_folders_to_scan = eval(json_file_data)
+                    if directory_string_posix in list_of_folders_to_scan:
+                        unique_directory = False
+                    list_of_folders_to_scan.append(directory_string_posix)
+                    with open(local_directories_to_scan_save_file_location, "w") as local_directories_to_scan_save_file:
+                        json.dump(list_of_folders_to_scan, local_directories_to_scan_save_file)
+                elif json_file_data == "":
+                    folders_to_scan_list : list = []
+                    folders_to_scan_list.append(directory_string_posix)
+                    file.write(json.dumps(folders_to_scan_list))
+                file.close() 
+        except:
+            traceback.print_exc()
+        print(unique_directory)
                         
         # if unique_folder == True:
         #     self.Folder_To_Scan_Card(self, directory) #create a card in settings screen
@@ -158,7 +163,7 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
         # self.list_of_files = scan_folders.scan_folders(directory_selected_string, unique_folder)
         # self.create_authors_dictionary()
         # self.add_main_menu_widgets()
-        LocalScanDirectory.scan_directory(directory_selected_string)
+        LocalScanDirectory.scan_directory(directory_string_posix)
 
     @staticmethod
     def remove_local_dictionary_from_scan_list():
