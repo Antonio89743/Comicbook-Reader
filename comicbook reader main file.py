@@ -66,6 +66,146 @@ from pathlib import Path
 # directories_to_scan_save_file_location = "Book Worm\Book Worm\local_folders_to_scan.json"
 # files_scanned_dictionary_file_location = "Book Worm\Book Worm\local_folders_to_scan.json"
 
+class Folder_To_Scan_Card():
+    def __init__(self, app, directory): # this func is still unfinished
+        card = MDCard(
+            orientation = "vertical",
+            size_hint = (1, None),
+            radius = [0, 0, 0, 0],
+            md_bg_color = (0, 0, 0, 1),
+            pos_hint = {"center_x": 0.5, "top": 1}
+        )
+        folder_path_label = Label(
+            text = directory
+        )
+        card.add_widget(folder_path_label)
+        remove_folder_from_scan_list_button = KivyButton(
+            on_press = lambda x: self.remove_folder_from_scan_list(app, card, directory),
+            text = "X",
+            size = (50, 50),
+            pos_hint = {"top": 1, "right": 1} 
+        )
+        card.add_widget(remove_folder_from_scan_list_button)
+        app.root.ids.local_folders_to_scan_expansion_panel.content.ids.local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list.add_widget(card)
+
+        # this isn't really doing anything
+        app.root.ids.local_folders_to_scan_expansion_panel.content.height = app.root.ids.local_folders_to_scan_expansion_panel.content.minimum_height
+        app.root.ids.local_folders_to_scan_expansion_panel.content.bind(minimum_height = app.root.ids.local_folders_to_scan_expansion_panel.content.setter("height"))
+
+        # the problem might be the first box view in 'content' kv, not the second one
+
+        # app.root.ids.local_folders_to_scan_expansion_panel.close_panel(app.root.ids.local_folders_to_scan_expansion_panel, app.root.ids.local_folders_to_scan_expansion_panel)
+        # # Exception has occurred: TypeError
+        # # MDExpansionPanel.close_panel() missing 2 required positional arguments: 'instance_expansion_panel' and 'press_current_panel'
+        # app.root.ids.local_folders_to_scan_expansion_panel.open_panel()
+
+        # fix position in regards to expansion panel and it going up
+        # maybe just fix height
+
+        # it's fine on reopening the expansion panel, so maybe just do that? 
+        # or just do minimal size?
+
+    def remove_folder_from_scan_list(self, app, card, directory): # this func is still unfinished
+        app.root.ids.local_folders_to_scan_expansion_panel.content.ids.local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list.remove_widget(card)
+        # resize expansion panel
+        app.root.ids.local_folders_to_scan_expansion_panel.content.height = app.root.ids.local_folders_to_scan_expansion_panel.content.minimum_height
+        # which one of the next 2 lines should be executed first?
+        self.remove_folder_from_list_of_folders_json(directory)
+        self.remove_folder_files_from_file_dictionary_json(app, directory)
+        # what if files has been removed but is still open in album viewer/file deatails/file reader screen?
+
+    def remove_folder_from_list_of_folders_json(self, directory):   
+        if exists(SaveFileManager.local_directories_to_scan_save_file_location):
+            file = open(SaveFileManager.local_directories_to_scan_save_file_location, "r")
+            json_file_data = file.read()
+            file.close()
+            if json_file_data != "":
+                list_of_directories_to_scan = eval(json_file_data)
+                if directory in list_of_directories_to_scan:
+                    file = open(SaveFileManager.local_directories_to_scan_save_file_location, "w")
+                    list_of_directories_to_scan.remove(directory)
+                    file.write(json.dumps(list_of_directories_to_scan))
+                    file.close()
+
+    def remove_folder_files_from_file_dictionary_json(self, app, folder): # this func is still unfinished
+        list_of_subfolders = [x[0] for x in os.walk(folder)]
+        # as it stands, to remove folder you've gotta open the file bellow twice, cut down on that
+        local_folders_to_scan = open(SaveFileManager.local_directories_to_scan_save_file_location, "r")
+        string_of_local_folders_to_scan = local_folders_to_scan.read()
+        local_folders_to_scan.close()
+        list_of_local_folders_to_scan = eval(string_of_local_folders_to_scan)
+        for folder_to_scan in list_of_local_folders_to_scan:
+            folder_to_scan = folder_to_scan.replace("\\\\", "\\")
+            folder_to_scan = folder_to_scan.replace("\\\\", "\\")
+            folder_to_scan = re.sub("/+", "/", folder_to_scan)
+        with open("Book Worm\Book Worm\local_folders_to_scan_dictonary.json") as local_files_dictionary:
+            try:
+                local_folders_to_scan_dictionary = json.load(local_files_dictionary)
+                for subfolder in list_of_subfolders:
+                    subfolder_path = subfolder.replace("\\\\", "\\")
+                    if subfolder_path not in list_of_local_folders_to_scan:
+                        for file in local_folders_to_scan_dictionary[:]:
+                            try:
+                                if file["file_format"] in app.music_tag_compatible_file_formats:
+                                    for album_track in file["album_tracks_dictionary"]:
+                                        album_track_path = album_track["absolute_file_path"]
+                                        file_absolute_path = album_track_path.replace("\\\\", "\\")
+                                        file_absolute_path = file_absolute_path.replace("\\\\", "\\")
+                                        if subfolder_path in file_absolute_path:
+                                            local_folders_to_scan_dictionary.remove(file)  
+                                            # why isn't nabokov audio book sample getting removed?
+                                else:
+                                    file_absolute_path = file["absolute_file_path"].replace("\\\\", "\\")
+                                    file_absolute_path = file_absolute_path.replace("\\\\", "\\") 
+                                    if subfolder_path in file_absolute_path:
+                                        local_folders_to_scan_dictionary.remove(file)    
+                            except TypeError:
+                                print("TypeError, remove_folder_files_from_file_dictionary_json(", folder, ")", file["absolute_file_path"]) 
+            except Exception:
+                logging.error(traceback.format_exc())
+            folder_path = folder.replace("\\\\", "\\")
+            for file in local_folders_to_scan_dictionary[:]:
+                try:
+                    if file["file_format"] in app.music_tag_compatible_file_formats:
+                        for album_track in file["album_tracks_dictionary"]:
+                            album_track_path = album_track["absolute_file_path"]
+                            file_absolute_path = album_track_path.replace("\\\\", "\\")
+                            file_absolute_path = file_absolute_path.replace("\\\\", "\\")
+                            if subfolder_path in file_absolute_path:
+                                local_folders_to_scan_dictionary.remove(file)  
+                    file_path = re.sub("/+", "/", file["absolute_file_path"])
+                    file_path_without_folder = file_path.removeprefix(folder_path)
+                    if file_path_without_folder[0] == "\\":
+                        file_path_without_folder = file_path_without_folder[1:]
+                    if ("/" not in file_path_without_folder) and ("\\" not in file_path_without_folder):
+                        local_folders_to_scan_dictionary.remove(file)   
+                except TypeError:
+                    print("TypeError", file["absolute_file_path"])
+                    pass
+                except AttributeError:
+                    print("AttributeError", file["absolute_file_path"])
+                    pass
+                except Exception:
+                    logging.error(traceback.format_exc())
+            if not local_folders_to_scan_dictionary:
+                file = open("Book Worm\Book Worm\local_folders_to_scan_dictonary.json", "w")
+                file.close()  
+            else:
+                file = open("Book Worm\Book Worm\local_folders_to_scan_dictonary.json", "w")
+                file.write(json.dumps(local_folders_to_scan_dictionary))
+                file.close()  
+        app.local_folders_and_files_scan()
+
+class SaveFileManager:
+
+    save_folder_location = "save_files"
+    local_directories_to_scan_save_file_location = save_folder_location + "/local_directories_to_scan.json"
+
+    def create_save_directory_and_save_files():
+        if exists(SaveFileManager.local_directories_to_scan_save_file_location) == False:
+            os.makedirs(os.path.dirname(SaveFileManager.local_directories_to_scan_save_file_location), exist_ok = True)
+        # check if all other save files exist, else, create them
+
 class AbstractScanDirectoryManager(ABC):
 
     @abstractmethod
@@ -95,7 +235,7 @@ class ScanDirectoryManager():
 class LocalScanDirectory(AbstractScanDirectoryManager):
 
     @staticmethod
-    def scan_directory(directory):
+    def scan_directory(directory): 
         print(directory, "gogogo")
 
 
@@ -129,24 +269,22 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
         pass
 
     @staticmethod
-    def add_local_dictionary_to_scan_list(directory):
+    def add_local_dictionary_to_scan_list(app, directory):
         directory_string_posix = Path(str(directory)[2:-2]).as_posix()
         unique_directory = True
-        save_folder_location = "save_files"
-        local_directories_to_scan_save_file_location = save_folder_location + "/local_directories_to_scan.json"
-        if exists(local_directories_to_scan_save_file_location) == False:
-            os.makedirs(os.path.dirname(local_directories_to_scan_save_file_location), exist_ok = True)
+        SaveFileManager.create_save_directory_and_save_files()
         try:
-            if exists(local_directories_to_scan_save_file_location):
-                file = open(local_directories_to_scan_save_file_location, "r+")
+            if exists(SaveFileManager.local_directories_to_scan_save_file_location):
+                file = open(SaveFileManager.local_directories_to_scan_save_file_location, "r+")
                 json_file_data = file.read()
                 if json_file_data != "":
                     list_of_folders_to_scan = eval(json_file_data)
                     if directory_string_posix in list_of_folders_to_scan:
                         unique_directory = False
-                    list_of_folders_to_scan.append(directory_string_posix)
-                    with open(local_directories_to_scan_save_file_location, "w") as local_directories_to_scan_save_file:
-                        json.dump(list_of_folders_to_scan, local_directories_to_scan_save_file)
+                    else:
+                        list_of_folders_to_scan.append(directory_string_posix)
+                        with open(SaveFileManager.local_directories_to_scan_save_file_location, "w") as local_directories_to_scan_save_file:
+                            json.dump(list_of_folders_to_scan, local_directories_to_scan_save_file)
                 elif json_file_data == "":
                     folders_to_scan_list : list = []
                     folders_to_scan_list.append(directory_string_posix)
@@ -154,36 +292,15 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
                 file.close() 
         except:
             traceback.print_exc()
-        print(unique_directory)
-                        
-        # if unique_folder == True:
-        #     self.Folder_To_Scan_Card(self, directory) #create a card in settings screen
-
-
-        # self.list_of_files = scan_folders.scan_folders(directory_selected_string, unique_folder)
+        if unique_directory == True:
+            Folder_To_Scan_Card(app, directory_string_posix)
+        LocalScanDirectory.scan_directory(directory_string_posix)
         # self.create_authors_dictionary()
         # self.add_main_menu_widgets()
-        LocalScanDirectory.scan_directory(directory_string_posix)
-
+        
     @staticmethod
     def remove_local_dictionary_from_scan_list():
         pass
-
-
-# class CloudScanDirectory(AbstractScanDirectoryManager):
-
-#     @staticmethod
-#     def scan_directory():
-#         pass
-
-#     @staticmethod
-#     def add_local_dictionary_to_scan_list():
-#         pass
-
-#     @staticmethod
-#     def remove_local_dictionary_from_scan_list():
-#         pass
-
 
 class LocalFolderPopUp(Popup):
     class DriveButton():
@@ -347,14 +464,14 @@ class MDWidgetManager:
                 )   
         self.app.root.ids["local_folders_to_scan_expansion_panel"] = local_folders_to_scan_expansion_panel
         self.app.root.ids.settings_scanning_local_folders_tab_box_layout.add_widget(local_folders_to_scan_expansion_panel)
-        # if exists("Book Worm\Book Worm\local_folders_to_scan.json"):
-        #     file = open("Book Worm\Book Worm\local_folders_to_scan.json", "r")
-        #     json_file_data = file.read()
-        #     file.close()
-        #     if json_file_data != "":
-        #         list_of_folders_to_scan = eval(json_file_data)
-        #         for folder in list_of_folders_to_scan:
-        #             self.Folder_To_Scan_Card(self, folder)
+        if exists(SaveFileManager.local_directories_to_scan_save_file_location):    
+            file = open(SaveFileManager.local_directories_to_scan_save_file_location, "r") 
+            json_file_data = file.read()
+            file.close()
+            if json_file_data != "":
+                list_of_folders_to_scan = eval(json_file_data)
+                for folder in list_of_folders_to_scan:
+                    Folder_To_Scan_Card(self.app, folder)
 
 class ComicbookReaderGUI(MDApp):
 
@@ -391,8 +508,3 @@ ComicbookReaderGUI().run()
 # should this be written in file class?
     # in that case, what to do with authors tab
     # should authors tab json be a thing?
-
-
-
-# first do scan individual directory picked
-    # and add it to json

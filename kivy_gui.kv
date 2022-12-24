@@ -42,7 +42,7 @@
                     on_release: root.dismiss()
                 Button:
                     text: "Add Folder"
-                    on_release: app.local_scan_directory_class.add_local_dictionary_to_scan_list(folder_chooser.selection)
+                    on_release: app.local_scan_directory_class.add_local_dictionary_to_scan_list(app, folder_chooser.selection)
                     
 <LocalFoldersExpansionPanelContent>
     local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list: local_folders_to_scan_expansion_panel_content_box_layout_folders_widget_list
