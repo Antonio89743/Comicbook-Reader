@@ -2,9 +2,6 @@ import zipfile
 import os.path
 from datetime import datetime
 
-
-
-
 def get_cbz_file_modified_time(file_path):
     unix_time = os.path.getmtime(file_path)
     return datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y %H:%M:%S")

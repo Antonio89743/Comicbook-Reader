@@ -223,22 +223,24 @@ class ScanDirectoryManager():
     def scan_all_directories():
         LocalScanDirectory.scan_all_directories()
 
-        # check if local json with directories exists
-            # if it does, enter it, iterate it and for each directory call local scan func
-            # else, create that file
-
-
-
-
-
         # for directory in 
         # LocalScanDirectory.scan_directory(directory)
         # CloudScanDirectory.scan_directory()
 
         # at the end call func to create all the widgets for authors and files
-        pass
 
 class LocalScanDirectory(AbstractScanDirectoryManager):
+
+    @staticmethod
+    def load_array_of_local_files():
+        if exists(SaveFileManager.array_of_local_files):
+            with open(SaveFileManager.array_of_local_files) as local_files_dictionary:
+                try:
+                    Globals.array_of_valid_files = json.load(local_files_dictionary)
+                    # self.create_authors_dictionary()
+                except Exception:
+                    if local_files_dictionary.read() == "":   
+                        Globals.array_of_valid_files = []
 
     @staticmethod
     def scan_directory(directory): 
@@ -437,6 +439,7 @@ class LocalScanDirectory(AbstractScanDirectoryManager):
             file.close()
             if json_file_data != "":
                 print(eval(json_file_data))
+                # UNFINISHED FUNC
 
 
                 # self.list_of_files = scan_folders.scan_folders(eval(json_file_data), False)
@@ -493,115 +496,115 @@ class MainMenuFilesWidget():
             self.create_main_menu_files_widget(app, file)
 
     def create_main_menu_files_widget(self, app, file):
-        if file["file_format"] == "txt":
-            file_title = file["file_name"]
-            card = MDCard(
-                    orientation = "vertical",
-                    size_hint = (None, None),
-                    height = Globals.main_menu_files_widgets_height,
-                    width = Globals.main_menu_files_widgets_width,
-                    radius = [0, 0, 0, 0],
-                    md_bg_color = (0, 0, 0, 0)
-                )
-            app.root.ids.main_menu_grid_layout.add_widget(card)
-            if file_title != None:
-                file_title_button = KivyButton(
-                        on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
-                        text = file_title,
-                        color = (0, 0, 0, 1),
-                        size_hint = (1, None),
-                        height = 50,
-                        # width = 300,
-                    )
-            else:
-                file_title_button = KivyButton(
-                    on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
-                    text = "File Title Not Found",
-                    color = (0, 0, 0, 1),
-                    size_hint = (1, None),
-                    height = 50,
-                    # width = 300,
-                )
-            file_title_button.bind(on_press = lambda x: app.load_file_read_screen(file))  
-            card.add_widget(file_title_button)   
-        elif file["file_format"] == "epub":
-            file_title = file["file_name"]
-            file_author = file["file_author"]
-            file_cover = zipfile.ZipFile(file["absolute_file_path"]).read(file["file_cover"])
-            card = MDCard(
-                    orientation = "vertical",
-                    size_hint = (None, None),
-                    height = Globals.main_menu_files_widgets_height,
-                    width = Globals.main_menu_files_widgets_width,
-                    radius = [0, 0, 0, 0],
-                    md_bg_color = (0, 0, 0, 0)
-                )
-            app.root.ids.main_menu_grid_layout.add_widget(card)
-            if file_cover != None:
-                cover_image = CoreImage(io.BytesIO(file_cover), ext = "jpg")
-                file_cover_button = KivyButton(
-                    background_color = (0, 0, 0, 0),
-                    pos_hint = {"bottom": 1}
-                    )
-                file_cover_image = Image(
-                    texture = CoreImage(cover_image).texture,
-                    allow_stretch = True,
-                    keep_ratio = True,
-                    pos_hint = {"bottom": 1},
-                    )
-                file_cover_button.bind(size = file_cover_image.setter("size"))
-                file_cover_button.bind(pos = file_cover_image.setter("pos"))
-                file_cover_button.add_widget(file_cover_image)
-            else:
-                file_cover_button = KivyButton(
-                    on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
-                    text = "File Cover Image Not Found",
-                    color = (0, 0, 0, 1),
-                    size_hint = (1, None),
-                    height = 50,
-                    # width = 300,
-                )
-            file_cover_button.bind(on_press = lambda button: app.main_menu_file_widget_pressed(file, button))
-            card.add_widget(file_cover_button)                         
-            if file_title != None:
-                file_title_button = KivyButton(
-                    on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
-                    text = file_title,
-                    color = (0, 0, 0, 1),
-                    size_hint = (1, None),
-                    height = 50,
-                    # width = 300,
-                )
-            else:
-                file_title_button = KivyButton(
-                on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
-                text = "File Title Not Found",
-                color = (0, 0, 0, 1),
-                size_hint = (1, None),
-                height = 50,
-                # width = 300,
-                )
-            file_title_button.bind(on_press = lambda x: app.load_file_read_screen(file))  
-            card.add_widget(file_title_button)
-            if file_author != None:
-                file_author_button = KivyButton(
-                    text = file_author,
-                    color = (0, 0, 0, 1),
-                    size_hint = (1, None),
-                    height = 50,
-                    # width = 300,
-                    )
-                file_author_button.bind(on_press = lambda button: app.main_menu_author_widget_pressed(button, app.authors_dictionary[file_author]))
-            else:
-                file_author_button = KivyButton(
-                text = "File Author Not Found",
-                color = (0, 0, 0, 1),
-                size_hint = (1, None),
-                height = 50,
-                # width = 300,
-                ) 
-            card.add_widget(file_author_button)
-        elif file["file_format"] == "cbz":
+        # if file["file_format"] == "txt":
+        #     file_title = file["file_name"]
+        #     card = MDCard(
+        #             orientation = "vertical",
+        #             size_hint = (None, None),
+        #             height = Globals.main_menu_files_widgets_height,
+        #             width = Globals.main_menu_files_widgets_width,
+        #             radius = [0, 0, 0, 0],
+        #             md_bg_color = (0, 0, 0, 0)
+        #         )
+        #     app.root.ids.main_menu_grid_layout.add_widget(card)
+        #     if file_title != None:
+        #         file_title_button = KivyButton(
+        #                 on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
+        #                 text = file_title,
+        #                 color = (0, 0, 0, 1),
+        #                 size_hint = (1, None),
+        #                 height = 50,
+        #                 # width = 300,
+        #             )
+        #     else:
+        #         file_title_button = KivyButton(
+        #             on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
+        #             text = "File Title Not Found",
+        #             color = (0, 0, 0, 1),
+        #             size_hint = (1, None),
+        #             height = 50,
+        #             # width = 300,
+        #         )
+        #     file_title_button.bind(on_press = lambda x: app.load_file_read_screen(file))  
+        #     card.add_widget(file_title_button)   
+        # elif file["file_format"] == "epub":
+        #     file_title = file["file_name"]
+        #     file_author = file["file_author"]
+        #     file_cover = zipfile.ZipFile(file["absolute_file_path"]).read(file["file_cover"])
+        #     card = MDCard(
+        #             orientation = "vertical",
+        #             size_hint = (None, None),
+        #             height = Globals.main_menu_files_widgets_height,
+        #             width = Globals.main_menu_files_widgets_width,
+        #             radius = [0, 0, 0, 0],
+        #             md_bg_color = (0, 0, 0, 0)
+        #         )
+        #     app.root.ids.main_menu_grid_layout.add_widget(card)
+        #     if file_cover != None:
+        #         cover_image = CoreImage(io.BytesIO(file_cover), ext = "jpg")
+        #         file_cover_button = KivyButton(
+        #             background_color = (0, 0, 0, 0),
+        #             pos_hint = {"bottom": 1}
+        #             )
+        #         file_cover_image = Image(
+        #             texture = CoreImage(cover_image).texture,
+        #             allow_stretch = True,
+        #             keep_ratio = True,
+        #             pos_hint = {"bottom": 1},
+        #             )
+        #         file_cover_button.bind(size = file_cover_image.setter("size"))
+        #         file_cover_button.bind(pos = file_cover_image.setter("pos"))
+        #         file_cover_button.add_widget(file_cover_image)
+        #     else:
+        #         file_cover_button = KivyButton(
+        #             on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
+        #             text = "File Cover Image Not Found",
+        #             color = (0, 0, 0, 1),
+        #             size_hint = (1, None),
+        #             height = 50,
+        #             # width = 300,
+        #         )
+        #     file_cover_button.bind(on_press = lambda button: app.main_menu_file_widget_pressed(file, button))
+        #     card.add_widget(file_cover_button)                         
+        #     if file_title != None:
+        #         file_title_button = KivyButton(
+        #             on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
+        #             text = file_title,
+        #             color = (0, 0, 0, 1),
+        #             size_hint = (1, None),
+        #             height = 50,
+        #             # width = 300,
+        #         )
+        #     else:
+        #         file_title_button = KivyButton(
+        #         on_press = lambda x: app.change_screen("Read Currently Open File Screen", False),
+        #         text = "File Title Not Found",
+        #         color = (0, 0, 0, 1),
+        #         size_hint = (1, None),
+        #         height = 50,
+        #         # width = 300,
+        #         )
+        #     file_title_button.bind(on_press = lambda x: app.load_file_read_screen(file))  
+        #     card.add_widget(file_title_button)
+        #     if file_author != None:
+        #         file_author_button = KivyButton(
+        #             text = file_author,
+        #             color = (0, 0, 0, 1),
+        #             size_hint = (1, None),
+        #             height = 50,
+        #             # width = 300,
+        #             )
+        #         file_author_button.bind(on_press = lambda button: app.main_menu_author_widget_pressed(button, app.authors_dictionary[file_author]))
+        #     else:
+        #         file_author_button = KivyButton(
+        #         text = "File Author Not Found",
+        #         color = (0, 0, 0, 1),
+        #         size_hint = (1, None),
+        #         height = 50,
+        #         # width = 300,
+        #         ) 
+        #     card.add_widget(file_author_button)
+        if file["file_format"] == "cbz":
             file_title = cbz_file_data.get_cbz_file_title(file["absolute_file_path"])
             file_author = file["file_author"]
             file_cover = zipfile.ZipFile(file["absolute_file_path"]).read(file["file_cover"])
@@ -977,7 +980,7 @@ class ComicbookReaderGUI(MDApp):
         if id == self.root.ids.main_menu_file_widget_size_slider:
             self.main_menu_files_widgets_height = 1000 * id.value
             self.main_menu_files_widgets_width = 600 * id.value
-            for child in self.root.ids.main_menu_grid_layout.children:
+            for child in self.root.ids.main_menu_files_tab_grid_layout.children:
                 child.height = self.main_menu_files_widgets_height
                 child.width = self.main_menu_files_widgets_width
             self.responsive_grid_layout()
@@ -1014,6 +1017,8 @@ class ComicbookReaderGUI(MDApp):
         # self.load_last_used_settings()
         self.responsive_grid_layout()
         self.md_widget_manager_object.create_local_folders_to_scan_expansion_panel()
+        LocalScanDirectory.load_array_of_local_files()
+        MainMenuFilesWidget(self)
         # ScanDirectoryManager.scan_all_directories()
         # self.local_folders_and_files_scan()
         # print(Config.get("graphics", "window_state"), Config.get("graphics", "fullscreen"))
